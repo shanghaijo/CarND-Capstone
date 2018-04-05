@@ -60,6 +60,7 @@ class DBWNode(object):
                                      brake_deadband=brake_deadband,
                                      decel_limit=decel_limit,
                                      accel_limit=accel_limit,
+				     wheel_radius=wheel_radius,
                                      wheel_base=wheel_base,
                                      steer_ratio=steer_ratio,
                                      max_lat_accel=max_lat_accel,
