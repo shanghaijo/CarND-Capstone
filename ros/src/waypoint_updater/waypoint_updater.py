@@ -46,7 +46,9 @@ class WaypointUpdater(object):
         rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)        
         rospy.Subscriber('/traffic_waypoint', Int32, self.traffic_cb)
         self.final_waypoints_pub = rospy.Publisher('final_waypoints', Lane, queue_size=1)
-        
+
+        self.decel_limit_param = 0.5 * abs(rospy.get_param('~/twist_controller/decel_limit', -5))
+
         self.loop()
         #rospy.spin()
         
@@ -106,7 +108,7 @@ class WaypointUpdater(object):
             
             stop_idx = max(self.stopline_wp_idx - closest_idx - 2, 0) #2 waypints back from line so front car stops at line
             dist = self.distance(waypoints, i, stop_idx)
-            vel = math.sqrt(2 * MAX_DECEL * dist)
+            vel = math.sqrt(2 * self.decel_limit_param * dist)
             if vel <1.:
                 vel = 0.
                 
