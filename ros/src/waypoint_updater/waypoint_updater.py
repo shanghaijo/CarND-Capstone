@@ -27,7 +27,6 @@ TODO (for Yousuf and Aaron): Stopline location for each traffic light.
 '''
 
 LOOKAHEAD_WPS = 200 # Number of waypoints we will publish. You can change this number
-MAX_DECEL = 20
 
 class WaypointUpdater(object):
     def __init__(self):
@@ -47,7 +46,9 @@ class WaypointUpdater(object):
         rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)        
         rospy.Subscriber('/traffic_waypoint', Int32, self.traffic_cb)
         self.final_waypoints_pub = rospy.Publisher('final_waypoints', Lane, queue_size=1)
-        
+
+        self.decel_limit_param = 0.5 * abs(rospy.get_param('~/twist_controller/decel_limit', -5))
+
         self.loop()
         
     def loop(self):
@@ -102,10 +103,10 @@ class WaypointUpdater(object):
 
             stop_idx = max(self.stopline_wp_idx - closest_idx -2, 0)  # Two waypoints back from the line so front of car stops at the line
             dist = self.distance(waypoints, i, stop_idx)
-            vel = math.sqrt(2 * MAX_DECEL * dist) # TODO: This could be smoother, maybe linear?
-            if vel < 1.:
-                vel = 0
-
+            vel = math.sqrt(2 * self.decel_limit_param * dist)
+            if vel <1.:
+                vel = 0.
+                
             p.twist.twist.linear.x = min(vel, wp.twist.twist.linear.x)
             temp.append(p)
 
