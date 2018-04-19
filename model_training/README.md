@@ -8,7 +8,11 @@ Follow the instructions found [here](https://github.com/tensorflow/models/blob/m
 
 ### Windows Instructions
 
-1. Open a priveledged command prompt
+1. Open a priveledged command prompt in this directory
+1. Clone the `tensorflow/models` repo:
+    ```cmd
+    git clone https://github.com/tensorflow/models.git
+    ```
 1. Install [python3](https://www.python.org/)
 1. Install tensorflow:
     ```cmd
@@ -29,9 +33,7 @@ Follow the instructions found [here](https://github.com/tensorflow/models/blob/m
     ```cmd
     pip install git+https://github.com/philferriere/cocoapi.git#subdirectory=PythonAPI
     ```
-1. Download [protoc](https://github.com/google/protobuf/releases/) and add its location to your PATH
-1. Locate your `tensorflow` package directory (path/to/python/Libs/site-packages/tensorflow) and `cd` to it
-1. Clone the tensorflow [models](https://github.com/tensorflow/models.git) repo
+1. Download [protoc](https://github.com/google/protobuf/releases/), place it in a directory of your choice, and add its location to your `PATH` environment variable
 1. Run Protobuf compilation:
     ```cmd
     cd models/research
