@@ -146,8 +146,8 @@ class WaypointUpdater(object):
 
         current_velocity_mph = self.current_velocity_mps / 0.44704
 
-        rospy.logwarn("[WaypointUpdater] self.current_velocity:%f. mph; %f mps" % (
-        current_velocity_mph, self.current_velocity_mps))
+        # rospy.logwarn("[WaypointUpdater] self.current_velocity:%f. mph; %f mps" % (
+        # current_velocity_mph, self.current_velocity_mps))
 
     def set_base_waypoints(self, lane):
         self.waypoints = lane.waypoints
