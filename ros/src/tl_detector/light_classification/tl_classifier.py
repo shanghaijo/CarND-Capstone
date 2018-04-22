@@ -1,3 +1,4 @@
+import numpy as np
 import tensorflow as tf
 from styx_msgs.msg import TrafficLight
 
@@ -38,7 +39,7 @@ class TLClassifier(object):
 
         """
         boxes = scores = classes = None
-        num = 0
+        num_detections = 0
 
         # Bounding Box Detection.
         with self.detection_graph.as_default():
@@ -47,8 +48,9 @@ class TLClassifier(object):
             (boxes, scores, classes, num) = self.sess.run(
                 [self.d_boxes, self.d_scores, self.d_classes, self.num_d],
                 feed_dict={self.image_tensor: img_expanded})
+            num_detection = tf.cast(num[0], tf.int32)
 
-        if num > 0:
+        if num_detections > 0:
             print(boxes)
             print(scores)
             # Filter out low scores
