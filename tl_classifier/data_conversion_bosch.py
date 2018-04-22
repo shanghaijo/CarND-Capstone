@@ -5,8 +5,17 @@ This file is courtesy of Anthony Sarkis:
 import tensorflow as tf
 import yaml
 import os
+import sys
+
+# change dir and path as specified in installation instructions
+RESEARCH_DIR = os.path.join(os.getcwd(), 'models', 'research')
+sys.path.append(RESEARCH_DIR)
+sys.path.append(os.path.join(RESEARCH_DIR, 'object_detection'))
+sys.path.append(os.path.join(RESEARCH_DIR, 'slim'))
+
 from object_detection.utils import dataset_util
 
+DATASET_TYPE = 'test'  # either 'train' or 'test'
 
 flags = tf.app.flags
 flags.DEFINE_string('output_path', '', 'Path to output TFRecord')
@@ -86,7 +95,7 @@ def main(_):
     writer = tf.python_io.TFRecordWriter(FLAGS.output_path)
 
     # BOSCH
-    INPUT_YAML = "data/test-bosch/dataset_test_rgb/test.yaml"
+    INPUT_YAML = "train/dataset_{0}_rgb/{0}.yaml".format(DATASET_TYPE)
     examples = yaml.load(open(INPUT_YAML, 'rb').read())
 
     #examples = examples[:10]  # for testing
