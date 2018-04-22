@@ -48,13 +48,13 @@ class Main(object):
     # image1.jpg
     # image2.jpg
     # If you want to test the code with your images, just add path to the images to the test_image_paths.
-    PATH_TO_TEST_IMAGES_DIR = os.path.join(RESEARCH_DIR, 'object_detection', 'test_images')
-    NUM_IMAGES = 2
+    PATH_TO_TEST_IMAGES_DIR = 'test_images'
+    VALID_IMAGE_EXTENSIONS = [ '.jpg', '.png', '.tif', '.tiff', '.gif', '.bmp', '.dib' ]
     PATH_TO_FIG_SAVE = 'output'
 
     def run(self, download_model = False):
         # Download the model
-        if (download_model):
+        if (download_model or not os.path.exists(self.MODEL_NAME)):
             print('Downloading model %s' % self.MODEL_NAME)
             opener = urllib.request.URLopener()
             opener.retrieve(self.DOWNLOAD_BASE + self.MODEL_FILE, self.MODEL_FILE)
@@ -63,6 +63,8 @@ class Main(object):
                 file_name = os.path.basename(file.name)
                 if 'frozen_inference_graph.pb' in file_name:
                     tar_file.extract(file, os.getcwd())
+        else:
+            print("Found model %s" % self.MODEL_NAME)
 
         # Load frozen Tensorflow model
         print('Loading frozen model %s' % self.PATH_TO_CKPT)
@@ -81,10 +83,13 @@ class Main(object):
         category_index = label_map_util.create_category_index(categories)
 
         print('Running model on test images in %s' % self.PATH_TO_TEST_IMAGES_DIR)
-        test_image_paths = [ os.path.join(self.PATH_TO_TEST_IMAGES_DIR, 'image{}.jpg'.format(i)) for i in range(1, self.NUM_IMAGES + 1) ]
+        test_image_folder_contents = os.listdir(self.PATH_TO_TEST_IMAGES_DIR)
+        test_image_paths = [ os.path.join(self.PATH_TO_TEST_IMAGES_DIR, filename) for filename in test_image_folder_contents
+                             if os.path.splitext(filename)[1] in self.VALID_IMAGE_EXTENSIONS ]
         if not os.path.exists(self.PATH_TO_FIG_SAVE):
             os.makedirs(self.PATH_TO_FIG_SAVE)
         for image_path in test_image_paths:
+            print('Classifying image %s' % os.path.basename(image_path))
             image = Image.open(image_path)
             # the array based representation of the image will be used later in order to prepare the
             # result image with boxes and labels on it.
@@ -107,6 +112,7 @@ class Main(object):
             plt.imshow(image_np)
             save_path = os.path.join(self.PATH_TO_FIG_SAVE, os.path.basename(image_path))
             plt.savefig(save_path, dpi='figure')
+        print('Output images saved in %s' % self.PATH_TO_FIG_SAVE)
 
     @staticmethod
     def load_image_into_numpy_array(image):
