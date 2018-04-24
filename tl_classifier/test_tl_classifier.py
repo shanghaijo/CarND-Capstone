@@ -24,10 +24,6 @@ from scipy.misc import imsave
 
 from object_detection.utils import ops as utils_ops
 
-if tf.__version__ < '1.4.0':
-    raise ImportError('Please upgrade your tensorflow installation to v1.4.* or later!')
-
-
 class Main(object):
     # Path to frozen detection graph. This is the actual model that is used for the object detection.
     PATH_TO_CKPT = os.path.join('train', 'fine_tuned_model','frozen_inference_graph.pb')
