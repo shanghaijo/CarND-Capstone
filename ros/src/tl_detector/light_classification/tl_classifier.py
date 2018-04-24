@@ -1,16 +1,28 @@
 import numpy as np
 import tensorflow as tf
 from styx_msgs.msg import TrafficLight
+import rospy
+
 
 class TLClassifier(object):
-    PATH_TO_CKPT = 'frozen_inference_graph.pb'
+    PATH_TO_CKPT = 'light_classification/fine_tuned_model_sim/frozen_inference_graph.pb'
 
     # Traffic Light Color mappings from classifier labels
     TL_COLOR = {
         1: TrafficLight.GREEN,
-        7: TrafficLight.YELLOW,
-        2: TrafficLight.RED
+        2: TrafficLight.RED,
+        3: TrafficLight.YELLOW,
+        4: TrafficLight.UNKNOWN
     }
+
+    TL_DEBUG = {
+        TrafficLight.GREEN: "GREEN",
+        TrafficLight.RED: "RED",
+        TrafficLight.YELLOW: "YELLOW",
+        TrafficLight.UNKNOWN: "UNKNOWN"
+    }
+
+    SCORE_THRESHOLD = 0.5
 
     def __init__(self):
         self.detection_graph = tf.Graph()
@@ -40,6 +52,10 @@ class TLClassifier(object):
             int: ID of traffic light color (specified in styx_msgs/TrafficLight)
 
         """
+        print("get_classification")
+
+        height, width, channels = image.shape
+
         boxes = scores = classes = None
         num_detections = 0
 
@@ -51,19 +67,42 @@ class TLClassifier(object):
             (boxes, scores, classes, num) = self.sess.run(
                 [self.d_boxes, self.d_scores, self.d_classes, self.num_d],
                 feed_dict={self.image_tensor: img_expanded})
-            num_detections = tf.cast(num[0], tf.int32)
 
-        boxes = np.squeeze(boxes)
-        scores = np.squeeze(scores)
-        classes = np.squeeze(classes).astype(np.int32)
+        num_detections = int(num[0])
+
+        detected_class = TrafficLight.UNKNOWN
 
         if num_detections > 0:
-            print(boxes)
-            print(scores)
-            # Filter out low scores
+            boxes = np.squeeze(boxes)
+            scores = np.squeeze(scores)
+            classes = np.squeeze(classes).astype(np.int32)
+
+            # print(boxes)
+            # print(scores)
+            # print(classes)
 
             # Find largest bounding box
+            idx_max_square = -1
+            max_square = 0
 
-            # Retreive class and return
+            for idx, score in enumerate(scores):
+                # Filter out low scores
+                if score >= self.SCORE_THRESHOLD:
+                    box = boxes[idx]
 
-        return TrafficLight.UNKNOWN
+                    box[0] = box[0] * height
+                    box[1] = box[1] * width
+                    box[2] = box[2] * height
+                    box[3] = box[3] * width
+                    square = abs(box[0] - box[2]) * abs(box[1] - box[3])
+
+                    if square > max_square:
+                        idx_max_square = idx
+
+            if idx_max_square > 0:
+                # Retreive class and return
+                detected_class = self.TL_COLOR[classes[idx_max_square]]
+
+        print("detected class: ", self.TL_DEBUG[detected_class])
+
+        return detected_class
