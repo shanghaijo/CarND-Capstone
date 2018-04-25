@@ -33,12 +33,11 @@ class TLClassifier(object):
 
         with self.detection_graph.as_default():
             od_graph_def = tf.GraphDef()
-            # Works up to here.
+
             with tf.gfile.GFile(self.PATH_TO_CKPT, 'rb') as fid:
-                serialized_graph = fid.read()
-                od_graph_def.ParseFromString(serialized_graph)
+                od_graph_def.ParseFromString(fid.read())
                 tf.import_graph_def(od_graph_def, name='')
-        self.sess = tf.Session(graph=self.detection_graph)
+        self.sess = tf.Session(graph=self.detection_graph, config=config)
 
         self.image_tensor = self.detection_graph.get_tensor_by_name('image_tensor:0')
         self.d_boxes = self.detection_graph.get_tensor_by_name('detection_boxes:0')
