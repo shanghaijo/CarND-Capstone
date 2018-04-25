@@ -27,6 +27,10 @@ class TLClassifier(object):
     def __init__(self):
         self.detection_graph = tf.Graph()
 
+        # Fix coutesy Anthony Sarkis (https://medium.com/@anthony_sarkis) taken from https://github.com/tensorflow/tensorflow/issues/6698
+        config = tf.ConfigProto()
+        config.gpu_options.allow_growth = True
+
         with self.detection_graph.as_default():
             od_graph_def = tf.GraphDef()
             # Works up to here.
