@@ -5,14 +5,14 @@ import rospy
 
 
 class TLClassifier(object):
-    PATH_TO_CKPT = 'light_classification/fine_tuned_model_sim/frozen_inference_graph.pb'
+    PATH_TO_CKPT = 'light_classification/fine_tuned_model_real_release/frozen_inference_graph.pb'
 
     # Traffic Light Color mappings from classifier labels
     TL_COLOR = {
-        1: TrafficLight.GREEN,
-        2: TrafficLight.RED,
-        3: TrafficLight.YELLOW,
-        4: TrafficLight.UNKNOWN
+       1: TrafficLight.RED,
+       2: TrafficLight.YELLOW,
+       3: TrafficLight.GREEN,
+       4: TrafficLight.UNKNOWN
     }
 
     TL_DEBUG = {
