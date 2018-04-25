@@ -1,6 +1,6 @@
 # Team Nanobots
 
-![team logo][assets/nanobots.jpg "Team Nanobots"]
+![team logo](assets/nanobots.jpg "Team Nanobots")
 
 ## Members
 
