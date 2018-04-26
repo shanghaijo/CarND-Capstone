@@ -5,22 +5,24 @@ import rospy
 
 
 class TLClassifier(object):
-    PATH_TO_CKPT = 'light_classification/fine_tuned_model_sim/frozen_inference_graph.pb'
+    PATH_TO_CKPT_SIM = 'light_classification/fine_tuned_model_sim/frozen_inference_graph.pb'
+    PATH_TO_CKPT_REAL = 'light_classification/fine_tuned_model_real_release/frozen_inference_graph.pb'
 
-    TL_COLOR = {
+    # Traffic Light Color mappings from SIM classifier labels
+    TL_COLOR_SIM = {
         1: TrafficLight.GREEN,
         2: TrafficLight.RED,
         3: TrafficLight.YELLOW,
         4: TrafficLight.UNKNOWN
     }
 
-    # Traffic Light Color mappings from classifier labels
-    # TL_COLOR = {
-    #    1: TrafficLight.RED,
-    #    2: TrafficLight.YELLOW,
-    #    3: TrafficLight.GREEN,
-    #    4: TrafficLight.UNKNOWN
-    # }
+    # Traffic Light Color mappings from REAL classifier labels
+    TL_COLOR_REAL = {
+       1: TrafficLight.RED,
+       2: TrafficLight.YELLOW,
+       3: TrafficLight.GREEN,
+       4: TrafficLight.UNKNOWN
+    }
 
     TL_DEBUG = {
         TrafficLight.GREEN: "GREEN",
@@ -31,8 +33,17 @@ class TLClassifier(object):
 
     SCORE_THRESHOLD = 0.5
 
-    def __init__(self):
+    def __init__(self, is_simulator):
         self.detection_graph = tf.Graph()
+
+        if is_simulator:
+            self.PATH_TO_CKPT = self.PATH_TO_CKPT_SIM
+            self.TL_COLOR = self.TL_COLOR_SIM
+        else:
+            self.PATH_TO_CKPT = self.PATH_TO_CKPT_REAL
+            self.TL_COLOR = self.TL_COLOR_SIM
+
+        rospy.loginfo("[TLClassifier] Loading: %s" % self.PATH_TO_CKPT)
 
         # Fix coutesy Anthony Sarkis (https://medium.com/@anthony_sarkis) taken from https://github.com/tensorflow/tensorflow/issues/6698
         config = tf.ConfigProto()
