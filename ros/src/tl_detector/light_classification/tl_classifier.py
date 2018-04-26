@@ -5,23 +5,17 @@ import rospy
 
 
 class TLClassifier(object):
-    PATH_TO_CKPT_SIM = 'light_classification/fine_tuned_model_sim/frozen_inference_graph.pb'
-    PATH_TO_CKPT_REAL = 'light_classification/fine_tuned_model_real_release/frozen_inference_graph.pb'
+    PATH_TO_CKPT = 'light_classification/fine_tuned_model/frozen_inference_graph.pb'
 
-    # Traffic Light Color mappings from SIM classifier labels
-    TL_COLOR_SIM = {
-        1: TrafficLight.GREEN,
-        2: TrafficLight.RED,
-        3: TrafficLight.YELLOW,
-        4: TrafficLight.UNKNOWN
-    }
+    CLASSIFIER_INPUT_WIDTH = 800
+    CLASSIFIER_INPUT_HEIGHT = 600
 
     # Traffic Light Color mappings from REAL classifier labels
-    TL_COLOR_REAL = {
-       1: TrafficLight.RED,
-       2: TrafficLight.YELLOW,
-       3: TrafficLight.GREEN,
-       4: TrafficLight.UNKNOWN
+    TL_COLOR = {
+        1: TrafficLight.RED,
+        2: TrafficLight.YELLOW,
+        3: TrafficLight.GREEN,
+        4: TrafficLight.UNKNOWN
     }
 
     TL_DEBUG = {
@@ -35,13 +29,6 @@ class TLClassifier(object):
 
     def __init__(self, is_simulator):
         self.detection_graph = tf.Graph()
-
-        if is_simulator:
-            self.PATH_TO_CKPT = self.PATH_TO_CKPT_SIM
-            self.TL_COLOR = self.TL_COLOR_SIM
-        else:
-            self.PATH_TO_CKPT = self.PATH_TO_CKPT_REAL
-            self.TL_COLOR = self.TL_COLOR_SIM
 
         rospy.loginfo("[TLClassifier] Loading: %s" % self.PATH_TO_CKPT)
 
@@ -76,6 +63,10 @@ class TLClassifier(object):
         # print("get_classification")
 
         height, width, channels = image.shape
+
+        if width != self.CLASSIFIER_INPUT_WIDTH and height != self.CLASSIFIER_INPUT_HEIGHT:
+            image = cv2.resize(image, (self.CLASSIFIER_INPUT_WIDTH, self.CLASSIFIER_INPUT_HEIGHT))
+            height, width, channels = image.shape
 
         boxes = scores = classes = None
         num_detections = 0
