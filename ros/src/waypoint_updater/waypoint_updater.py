@@ -65,6 +65,8 @@ class WaypointUpdater(object):
         self.current_pose = None
         self.current_velocity_mps = 0
         self.waypoints = None
+        self.waypoints_2d = None
+        self.waypoint_tree = None
         self.stop_waypoint_index = None
 
         rospy.logwarn("[WaypointUpdater] Initialization successful!")
@@ -151,10 +153,10 @@ class WaypointUpdater(object):
 
     def set_base_waypoints(self, lane):
         self.waypoints = lane.waypoints
-
-        self.waypoints_2d = [[waypoint.pose.pose.position.x, waypoint.pose.pose.position.y] for waypoint in
-                             lane.waypoints]
-        self.waypoint_tree = KDTree(self.waypoints_2d)
+        if not self.waypoints_2d:
+            self.waypoints_2d = [[waypoint.pose.pose.position.x, waypoint.pose.pose.position.y] for waypoint in
+                                lane.waypoints]
+            self.waypoint_tree = KDTree(self.waypoints_2d)
 
     def set_closest_traffic_waypoint(self, msg):
         self.stop_waypoint_index = msg.data
