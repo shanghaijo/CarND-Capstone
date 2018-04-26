@@ -55,7 +55,7 @@ class TLClassifier(object):
             int: ID of traffic light color (specified in styx_msgs/TrafficLight)
 
         """
-        print("get_classification")
+        # print("get_classification")
 
         height, width, channels = image.shape
 
@@ -106,6 +106,6 @@ class TLClassifier(object):
                 # Retreive class and return
                 detected_class = self.TL_COLOR[classes[idx_max_square]]
 
-        print("detected class: ", self.TL_DEBUG[detected_class])
+        rospy.loginfo("[TLClassifier] Detected traffic light: %s" % self.TL_DEBUG[detected_class])
 
         return detected_class
