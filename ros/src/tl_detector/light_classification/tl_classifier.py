@@ -35,6 +35,7 @@ class TLClassifier(object):
         # Fix coutesy Anthony Sarkis (https://medium.com/@anthony_sarkis) taken from https://github.com/tensorflow/tensorflow/issues/6698
         config = tf.ConfigProto()
         config.gpu_options.allow_growth = True
+        config.log_device_placement = True
 
         with self.detection_graph.as_default():
             od_graph_def = tf.GraphDef()
