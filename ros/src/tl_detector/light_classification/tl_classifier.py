@@ -2,6 +2,7 @@ import numpy as np
 import tensorflow as tf
 from styx_msgs.msg import TrafficLight
 import rospy
+import cv2
 
 
 class TLClassifier(object):
