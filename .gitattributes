@@ -1,3 +1,8 @@
 *.pb filter=lfs diff=lfs merge=lfs -text
 ros/src/tl_detector/light_classification/fine_tuned_model_real_release/**/* filter=lfs diff=lfs merge=lfs -text
 *.ckpt* filter=lfs diff=lfs merge=lfs -text
+ros/src/tl_detector/light_classification/fine_tuned_model_real/saved_model/variables filter=lfs diff=lfs merge=lfs -text
+ros/src/tl_detector/light_classification/fine_tuned_model/saved_model/saved_model.pb filter=lfs diff=lfs merge=lfs -text
+ros/src/tl_detector/light_classification/fine_tuned_model_sim/saved_model/saved_model.pb filter=lfs diff=lfs merge=lfs -text
+ros/src/tl_detector/light_classification/fine_tuned_model_sim/saved_model/variables filter=lfs diff=lfs merge=lfs -text
+ros/src/tl_detector/light_classification/fine_tuned_model_real/saved_model/saved_model.pb filter=lfs diff=lfs merge=lfs -text

@@ -6,16 +6,20 @@ import cv2
 
 
 class TLClassifier(object):
-    PATH_TO_CKPT = 'light_classification/fine_tuned_model/frozen_inference_graph.pb'
-
-    CLASSIFIER_INPUT_WIDTH = 800
-    CLASSIFIER_INPUT_HEIGHT = 600
+    PATH_TO_CKPT = 'light_classification/fine_tuned_model_real/frozen_inference_graph.pb'
 
     # Traffic Light Color mappings from REAL classifier labels
+    # TL_COLOR = {
+    #     1: TrafficLight.RED,
+    #     2: TrafficLight.YELLOW,
+    #     3: TrafficLight.GREEN,
+    #     4: TrafficLight.UNKNOWN
+    # }
+
     TL_COLOR = {
-        1: TrafficLight.RED,
-        2: TrafficLight.YELLOW,
-        3: TrafficLight.GREEN,
+        2: TrafficLight.RED,
+        3: TrafficLight.YELLOW,
+        1: TrafficLight.GREEN,
         4: TrafficLight.UNKNOWN
     }
 
@@ -64,11 +68,7 @@ class TLClassifier(object):
         """
         # print("get_classification")
 
-        height, width, channels = image.shape
-
-        if width != self.CLASSIFIER_INPUT_WIDTH and height != self.CLASSIFIER_INPUT_HEIGHT:
-            image = cv2.resize(image, (self.CLASSIFIER_INPUT_WIDTH, self.CLASSIFIER_INPUT_HEIGHT))
-            height, width, channels = image.shape
+        height, width, _ = image.shape
 
         boxes = scores = classes = None
         num_detections = 0
@@ -91,29 +91,30 @@ class TLClassifier(object):
             scores = np.squeeze(scores)
             classes = np.squeeze(classes).astype(np.int32)
 
-            # print(boxes)
-            # print(scores)
-            # print(classes)
+            # print('boxes:\n%s\n' % boxes)
+            # print('scores:\n%s\n' % scores)
+            # print('classes:\n%s\n' % classes)
 
             # Find largest bounding box
             idx_max_square = -1
             max_square = 0
 
-            for idx, score in enumerate(scores):
+            for idx in range(scores.shape[0]):
                 # Filter out low scores
-                if score >= self.SCORE_THRESHOLD:
+                if scores[idx] >= self.SCORE_THRESHOLD:
                     box = boxes[idx]
 
-                    box[0] = box[0] * height
-                    box[1] = box[1] * width
-                    box[2] = box[2] * height
-                    box[3] = box[3] * width
-                    square = abs(box[0] - box[2]) * abs(box[1] - box[3])
+                    box_height = abs((box[0] - box[2]) * height)
+                    box_width = abs((box[1] - box[3]) * width)
+                    square = box_height * box_width
 
                     if square > max_square:
+                        max_square = square
                         idx_max_square = idx
 
-            if idx_max_square > 0:
+            # print('largest box: %d (%d)\n' % (idx_max_square, max_square))
+
+            if idx_max_square >= 0:
                 # Retreive class and return
                 detected_class = self.TL_COLOR[classes[idx_max_square]]
 
